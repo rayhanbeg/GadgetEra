@@ -10,7 +10,7 @@ import Login from "./pages/Login";
 import Signin from "./pages/Signin";
 import Dashboard from "./admin/Dashboard";
 import Order from "./admin/pages/Order";
-import MainLayout from "./MainLayout/MainLayout";
+import MainLayout from "./mainLayout/MainLayout";
 import AddItem from "./admin/pages/AddItem";
 import ListPage from "./admin/pages/ListPage";
 import ProtectedRoute from "./admin/ProtectedRoute";
