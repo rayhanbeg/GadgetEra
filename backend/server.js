@@ -10,20 +10,14 @@ import cartRouter from "./routes/cartRoute.js";
 import orderRoute from "./routes/orderRoute.js";
 
 // Config env
-dotenv.config()
-
+dotenv.config();
 
 // Database and Cloudinary Config
 connectDB();
 connectCloudinary();
 
-
-// PORT
+// Create the Express app
 const app = express();
-const port = process.env.PORT || 5000;
-
-
-
 
 // Middlewares
 app.use(cors({
@@ -33,19 +27,16 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-
 // Routes
-app.use('/api/user', userRoute)
-app.use('/api/product', productRouter)
-app.use('/api/cart', cartRouter)
-app.use('/api/order', orderRoute)
+app.use('/api/user', userRoute);
+app.use('/api/product', productRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/order', orderRoute);
 
 // Endpoints
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
-// Listen
-app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
-});
+// Export app to be handled by Vercel
+export default app;
