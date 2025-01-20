@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const Navbar = ({containerStyles, onClick}) => {
     const navLinks = [
         {path:'/', title:'Home'},
-        {path:'/collection', title:'collection'},
+        {path:'/shop', title:'shop'},
         {path:'/blog', title:'Blog'},
         {path:'/contact', title:'Contact'},
     ]

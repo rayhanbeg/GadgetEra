@@ -1,6 +1,7 @@
 import express from "express";
 import {
   allOrders,
+  cancelOrder,
   placeOrder,
   placeOrderStripe,
   updateStatus,
@@ -19,6 +20,6 @@ orderRoute.post("/placeOrderStripe", placeOrderStripe);
 
 // For User
 orderRoute.post("/userOrders/:userId", userOrders); 
-
+orderRoute.put("/cancelOrder/:orderId", cancelOrder);
 
 export default orderRoute;

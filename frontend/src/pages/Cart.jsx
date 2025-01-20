@@ -6,8 +6,14 @@ import CartTotal from "../components/CartTotal";
 import Footer from "../components/Footer";
 
 const Cart = () => {
-  const { products, currency, cartItems, getCartCount, updateQuantity, navigate } =
-    useContext(ShopContext);
+  const {
+    products,
+    currency,
+    cartItems,
+    getCartCount,
+    updateQuantity,
+    navigate,
+  } = useContext(ShopContext);
   const [cartData, setCartData] = useState([]);
   const [quantities, setQuantities] = useState([]);
 
@@ -134,10 +140,13 @@ const Cart = () => {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <CartTotal />
             <button
-              onClick={() => navigate('/place-order')}
+              disabled={cartData.length === 0}
+              onClick={() => cartData.length > 0 && navigate("/place-order")}
               className="w-full mt-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
             >
-              Proceed to Checkout
+              {cartData.length === 0
+                ? "Please add items to proceed."
+                : "Proceed to Checkout"}
             </button>
           </div>
         </div>

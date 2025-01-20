@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { login } from "../redux/authSlice"; // Adjust path as per your project structure
 import { useLocation, useNavigate } from "react-router-dom";

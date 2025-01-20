@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { ShopContext } from "../context/ShopContext";
 
 const Item = ({ product }) => {
     const [hovered, setHovered] = useState(false)
+    const { currency } = useContext(ShopContext);
   return (
     <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
       {/* Image */}
@@ -24,7 +26,7 @@ const Item = ({ product }) => {
         <h4 className="font-semibold text-lg line-clamp-1">{product.name}</h4>
         <div className="flex justify-between items-center my-2 text-gray-600">
           <p className="text-sm">{product.category}</p>
-          <h5 className="font-bold text-gray-800">${product.price}</h5>
+          <h5 className="font-bold text-gray-800">{currency}{product.price}</h5>
         </div>
         <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
       </div>

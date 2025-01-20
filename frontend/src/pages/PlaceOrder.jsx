@@ -4,10 +4,10 @@ import Footer from "../components/Footer";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { replace } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const PlaceOrder = () => {
-  const {user} = useSelector((state) => state.auth)
+  const { user } = useSelector((state) => state.auth);
   const [method, setMethod] = useState("cod");
   const {
     products,
@@ -33,7 +33,6 @@ const PlaceOrder = () => {
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
-
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
@@ -44,7 +43,7 @@ const PlaceOrder = () => {
         console.error("User not found or userId is missing");
         return;
       }
-  
+
       let orderItems = [];
       for (const items in cartItems) {
         for (const item in cartItems[items]) {
@@ -60,15 +59,14 @@ const PlaceOrder = () => {
           }
         }
       }
-  
-      // Prepare order data
+
       const orderData = {
-        userId: user._id, // Ensure userId is included
+        userId: user._id,
         address: formData,
         items: orderItems,
         amount: getTotalAmount() + deliveryCharge,
       };
-  
+
       switch (method) {
         case "cod": {
           const response = await axios.post(
@@ -77,6 +75,7 @@ const PlaceOrder = () => {
           );
           if (response.data.success) {
             setCartItems({});
+            toast.success("Order placed successfully!");
             navigate("/orders");
           } else {
             console.error("Order placement failed:", response.data.message);
@@ -89,8 +88,8 @@ const PlaceOrder = () => {
             orderData
           );
           if (responseStripe.data.success) {
-            const { url } = responseStripe.data; // Updated to correctly extract session URL
-            window.location.replace(url); // Redirect to Stripe session
+            const { url } = responseStripe.data;
+            window.location.replace(url);
           } else {
             console.error("Stripe session creation failed:", responseStripe.data.message);
           }
@@ -104,7 +103,6 @@ const PlaceOrder = () => {
       console.error("Error placing order:", error);
     }
   };
-  
 
   return (
     <section className="bg-gray-100 py-8">

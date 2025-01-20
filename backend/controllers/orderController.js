@@ -132,4 +132,39 @@ const updateStatus = async (req, res) => {
   }
 };
 
-export { placeOrder, placeOrderStripe, allOrders, userOrders, updateStatus };
+
+// In your order controller
+// In your order controller
+const cancelOrder = async (req, res) => {
+  const {  userId } = req.body; // Extracting from the request body
+  const { orderId } = req.params;
+
+  try {
+    // Validate inputs
+    if (!orderId || !userId) {
+      return res.status(400).json({ success: false, message: "Missing orderId or userId" });
+    }
+
+    // Find the order by its ID and user ID
+    const order = await orderModel.findOne({ _id: orderId, userId });
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Cancel the order
+    order.status = "Canceled";
+    await order.save();
+
+    res.status(200).json({ success: true, message: "Order canceled successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+
+
+
+export { placeOrder, placeOrderStripe, allOrders, userOrders, updateStatus, cancelOrder };

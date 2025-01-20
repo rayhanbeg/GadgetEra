@@ -3,7 +3,7 @@ import Search from "../components/Search";
 import { ShopContext } from "../context/ShopContext";
 import Item from "../components/Item";
 
-const Collection = () => {
+const shop = () => {
   const { products, search } = useContext(ShopContext);
   const [category, setCategory] = useState([]);
   const [sortType, setSortType] = useState("relevant");
@@ -61,17 +61,16 @@ const Collection = () => {
   const totalPages = Math.ceil(filteredProducts.length / itemPage);
 
   return (
-    <div className="max-padd-container !px-0">
+    <div className="mx-auto max-w-[1440px] px-6 lg:px-12 mt-12">
       <div className="flex flex-col sm:flex-row gap-8 mb-16">
-        {/* Filter option */}
-
-        <div className="min-w-72 bg-primary p-4 mt-8 pl-4 lg:pl-4">
-          <Search />
-          <div className="pl-5 py-3 mt-4 bg-white rounded-xl">
-            <h5 className="text-[14px] md:text-[15px] font-bold mb-4">
-              Categories
-            </h5>
-            <div className="flex flex-col gap-2 text-sm font-light">
+        {/* Filter Options */}
+        <div className=" min-w-[200px] sm:border-l sm:pl-6 bg-primary/10">
+          <div className="flex items-center border-2 rounded-xl max-h-16">
+            <Search />
+          </div>
+          <div className="mt-4 border p-4 rounded-md bg-white">
+            <h5 className="text-lg font-semibold mb-3">Categories</h5>
+            <div className="flex flex-col gap-2">
               {[
                 "Headphones",
                 "Cameras",
@@ -81,65 +80,78 @@ const Collection = () => {
                 "Mouse",
                 "Mobile",
               ].map((cat, index) => (
-                <label
-                  key={index}
-                  className="flex gap-2 medium-14 text-gray-30"
-                >
+                <label key={index} className="flex gap-2 text-sm">
                   <input
                     onChange={(e) => toggleFilter(e.target.value, setCategory)}
                     type="checkbox"
                     name="category"
                     value={cat}
-                    className="w-3"
                   />
                   {cat}
                 </label>
               ))}
             </div>
           </div>
-          <div className="px-4 py-3 mt-6 bg-white rounded-xl">
-            <h5 className="text-[14px] md:text-[15px]font-bold mb-4">
-              Sort By
-            </h5>
+          <div className="mt-6 border p-4 rounded-md">
+            <h5 className="text-lg font-semibold mb-3">Sort By</h5>
             <select
-              name=""
-              id=""
               onChange={(e) => setSortType(e.target.value)}
-              className="border border-slate-900/5 outline-none text-gray-30 medium-14 h-8 w-full rounded px-2"
+              className="border w-full rounded px-2 py-1"
             >
-              <option value="relevant">relevant</option>
-              <option value="low">low</option>
-              <option value="high">high</option>
+              <option value="relevant">Relevant</option>
+              <option value="low">Price: Low to High</option>
+              <option value="high">Price: High to Low</option>
             </select>
           </div>
         </div>
-        {/* Right Side */}
-        <div className="pr-5 rounded-l-xl">
-          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 gap-y-6">
-            {getPaginatedProducts().length > 0
-              ? getPaginatedProducts().map((product) => (
-                  <Item product={product} key={product._id} />
-                ))
-              : <p className="">No products found</p>}
+
+        {/* Product Display */}
+        <div className="flex-1">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {getPaginatedProducts().length > 0 ? (
+              getPaginatedProducts().map((product) => (
+                <Item product={product} key={product._id} />
+              ))
+            ) : (
+              <p className="text-center col-span-full">
+                No products found matching your filters.
+              </p>
+            )}
           </div>
+
           {/* Pagination */}
-          <div className="flex items-center justify-center flex-wrap gap-4 mt-14 mb-10">
-            <button disabled={currentPage === 1} 
-            onClick={() => setCurrentPage(prev => prev - 1)}
-            className={`${currentPage === 1 && "opacity-50 cursor-not-allowed"} btn-secondary !py-1 !px-3`}
-            >Previous</button>
-            {Array.from({length: totalPages}, (_, index) => (
-              <button key={index + 1}
-              onClick={() => setCurrentPage(index + 1)}
-              className={`${currentPage === index + 1 && "!bg-tertiary text-white"}  btn-light !py-1 !px-3`}
+          <div className="flex justify-center items-center mt-10 gap-3">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className={`px-4 py-2 border rounded ${
+                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`px-4 py-2 border rounded ${
+                  currentPage === index + 1 ? "font-semibold border-black" : ""
+                }`}
               >
                 {index + 1}
               </button>
-            ) )}
-            <button disabled={currentPage === totalPages} 
-            onClick={() => setCurrentPage(prev => prev + 1)}
-            className={`${currentPage === totalPages && "opacity-50 cursor-not-allowed"} btn-secondary !py-1 !px-3`}
-            >Next</button>
+            ))}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className={`px-4 py-2 border rounded ${
+                currentPage === totalPages
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
@@ -147,4 +159,4 @@ const Collection = () => {
   );
 };
 
-export default Collection;
+export default shop;

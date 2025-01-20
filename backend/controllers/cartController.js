@@ -28,34 +28,30 @@ const updateCart = async (req, res) => {
     const { userId, itemId, color, quantity } = req.body;
 
     // Validate the inputs
-    if (!userId || !itemId || !color || quantity < 1) {
+    if (!userId || !itemId || !color || quantity < 0) {
       return res.status(400).json({ success: false, message: "Invalid inputs" });
     }
 
-    // Fetch user data
-    const userData = await userModel.findById(userId);
-    if (!userData) {
+    // Update cart data in a single operation
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: { [`cartData.${itemId}.${color}`]: quantity },
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Initialize or update cartData
-    let cartData = userData.cartData || {};
-
-    // Ensure item and color exist in cartData
-    if (!cartData[itemId]) {
-      cartData[itemId] = {};
-    }
-    cartData[itemId][color] = quantity;
-
-    // Save updated cartData
-    await userModel.findByIdAndUpdate(userId, { cartData }, { new: true });
-
-    res.json({ success: true, message: "Updated cart", cartData });
+    res.json({ success: true, message: "Cart updated successfully", cartData: updatedUser.cartData });
   } catch (error) {
     console.error("Error updating cart:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 
 const getUserCart = async (req, res) => {
@@ -71,6 +67,8 @@ const getUserCart = async (req, res) => {
       res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
 
 
 export { addCart, updateCart, getUserCart };
