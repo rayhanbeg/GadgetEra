@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import Search from "../components/Search";
 import { ShopContext } from "../context/ShopContext";
 import Item from "../components/Item";
+import Loader from "../components/Loader"; // Import the custom Loader
 
 const shop = () => {
   const { products, search } = useContext(ShopContext);
@@ -9,6 +10,7 @@ const shop = () => {
   const [sortType, setSortType] = useState("relevant");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true); // State for loader
   const itemPage = 10;
 
   const toggleFilter = (value, setState) => {
@@ -46,10 +48,12 @@ const shop = () => {
   };
 
   useEffect(() => {
+    setLoading(true); // Show loader
     let filtered = applyFilter();
     let stored = applySorting(filtered);
     setFilteredProducts(stored);
     setCurrentPage(1); // Reset to the first page when filters change
+    setLoading(false); // Hide loader
   }, [category, sortType, products, search]);
 
   const getPaginatedProducts = () => {
@@ -64,7 +68,7 @@ const shop = () => {
     <div className="mx-auto max-w-[1440px] px-6 lg:px-12 mt-12">
       <div className="flex flex-col sm:flex-row gap-8 mb-16">
         {/* Filter Options */}
-        <div className=" min-w-[200px] sm:border-l sm:pl-6 bg-primary/10">
+        <div className="min-w-[200px] sm:border-l sm:pl-6 bg-primary/10">
           <div className="flex items-center border-2 rounded-xl max-h-16">
             <Search />
           </div>
@@ -107,52 +111,60 @@ const shop = () => {
 
         {/* Product Display */}
         <div className="flex-1">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {getPaginatedProducts().length > 0 ? (
-              getPaginatedProducts().map((product) => (
-                <Item product={product} key={product._id} />
-              ))
-            ) : (
-              <p className="text-center col-span-full">
-                No products found matching your filters.
-              </p>
-            )}
-          </div>
+          {loading ? (
+            <Loader message="Loading products..." size="12" color="blue-500" />
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {getPaginatedProducts().length > 0 ? (
+                getPaginatedProducts().map((product) => (
+                  <Item product={product} key={product._id} />
+                ))
+              ) : (
+                <p className="text-center col-span-full">
+                  No products found matching your filters.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Pagination */}
-          <div className="flex justify-center items-center mt-10 gap-3">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className={`px-4 py-2 border rounded ${
-                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => (
+          {!loading && (
+            <div className="flex justify-center items-center mt-10 gap-3">
               <button
-                key={index + 1}
-                onClick={() => setCurrentPage(index + 1)}
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
                 className={`px-4 py-2 border rounded ${
-                  currentPage === index + 1 ? "font-semibold border-black" : ""
+                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {index + 1}
+                Previous
               </button>
-            ))}
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className={`px-4 py-2 border rounded ${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-            >
-              Next
-            </button>
-          </div>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`px-4 py-2 border rounded ${
+                    currentPage === index + 1
+                      ? "font-semibold border-black"
+                      : ""
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                className={`px-4 py-2 border rounded ${
+                  currentPage === totalPages
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

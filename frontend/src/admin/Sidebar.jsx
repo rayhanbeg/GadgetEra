@@ -9,6 +9,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const { navigate } = useContext(ShopContext);
+  
   // Toggle the sidebar visibility
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -30,8 +31,8 @@ const Sidebar = () => {
       {/* Hamburger Menu for Small Screens */}
       <div className="bg-gray-100 text-gray-800 flex justify-between items-center md:hidden w-full p-4">
         <div className="font-bold">
-          <Link to="/">
-            <h1>GadgetEra</h1>
+        <Link to="/" className="text-2xl font-bold text-gray-800">
+            Gadget<span className="text-blue-600">Era</span>
           </Link>
         </div>
         <button
@@ -58,10 +59,8 @@ const Sidebar = () => {
 
         {/* Logo */}
         <div className="hidden md:flex justify-center items-center mb-6">
-          <Link to="/">
-            <h1 className="text-2xl font-bold px-4 py-2">
-              GadgetEra
-            </h1>
+        <Link to="/" className="text-2xl font-bold text-gray-800">
+            Gadget<span className="text-blue-600">Era</span>
           </Link>
         </div>
 

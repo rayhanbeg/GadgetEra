@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { TbTrash } from "react-icons/tb";
+import { ShopContext } from "../../context/ShopContext";
 
 const ListPage = () => {
+  const { currency } = useContext(ShopContext);
+
   const [list, setList] = useState([]);
+
 
   const fetchList = async () => {
     try {
@@ -14,7 +18,6 @@ const ListPage = () => {
 
       if (response.data.success) {
         setList(response.data.products);
-        toast.success(response.data.message);
       } else {
         toast.error(response.data.message);
       }
@@ -27,7 +30,6 @@ const ListPage = () => {
   const removeProduct = async (id) => {
     try {
        const response = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/product/remove/${id}`)
-       console.log(response);
        if(response?.data?.success) {
            toast.success(response.data.message);
           await fetchList();
@@ -77,7 +79,7 @@ const ListPage = () => {
                 <div className="text-gray-800 font-medium">{item.name}</div>
                 <div className="text-gray-500">{item.category}</div>
                 <div className="text-green-600 font-semibold">
-                  ${item.price.toFixed(2)}
+                  {currency}{item.price.toFixed(2)}
                 </div>
                 <div className="flex justify-center">
                   <button

@@ -17,7 +17,7 @@ const NewArrivals = () => {
   }, [products]);
 
   return (
-    <section className="mt-12 max-padd-container">
+    <section className="mt-12 mx-auto max-w-[1440px] px-6 lg:px-12">
       {/* Title Section */}
     <Title/>
 

@@ -3,28 +3,35 @@ import { Link } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 
 const Item = ({ product }) => {
-    const [hovered, setHovered] = useState(false)
-    const { currency } = useContext(ShopContext);
+  const [hovered, setHovered] = useState(false);
+  const { currency } = useContext(ShopContext);
+
   return (
-    <div className="overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       {/* Image */}
       <Link
         to={`/product/${product._id}`}
-        onMouseEnter={() =>setHovered(true)}
+        onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="flex items-center justify-center overflow-hidden relative"
+        className="block relative overflow-hidden"
       >
         <img
-          src={product?.image?.length > 1 && hovered[0] ? product?.image[1] : product?.image[0]}
+          src={
+            product?.image?.length > 1 && hovered
+              ? product?.image[1]
+              : product?.image[0]
+          }
           alt={product.name}
-          className="w-full h-60 object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-60 object-cover group-hover:scale-105 transition-all duration-300"
         />
+        {/* Hover Effect */}
+        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
       </Link>
 
-      {/* Info */}
-      <div className="p-3">
-        <h4 className="font-semibold text-lg line-clamp-1">{product.name}</h4>
-        <div className="flex justify-between items-center my-2 text-gray-600">
+      {/* Product Info */}
+      <div className="p-4 bg-white">
+        <h4 className="font-semibold text-lg text-gray-900 truncate">{product.name}</h4>
+        <div className="flex justify-between items-center my-2 text-gray-700">
           <p className="text-sm">{product.category}</p>
           <h5 className="font-bold text-gray-800">{currency}{product.price}</h5>
         </div>

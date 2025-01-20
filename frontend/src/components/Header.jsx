@@ -18,14 +18,11 @@ const Navbar = () => {
     { path: "/shop", title: "Shop" },
   ];
 
-  // Ref for the menu and the toggle button
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
 
-  // Toggle menu function
   const toggleMenu = () => setMenuOpened((prev) => !prev);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -51,12 +48,10 @@ const Navbar = () => {
     <>
       <header className="w-full bg-white fixed z-50 shadow">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between py-4">
-          {/* Logo */}
           <Link to="/" className="text-2xl font-bold text-gray-800">
             Gadget<span className="text-blue-600">Era</span>
           </Link>
 
-          {/* Navigation Links */}
           <nav
             ref={menuRef}
             className={`${
@@ -83,11 +78,9 @@ const Navbar = () => {
             ))}
           </nav>
 
-          {/* Right-Side Buttons */}
           <div className="flex items-center gap-4">
-            {/* Cart */}
             <Link to="/cart" className="relative">
-              <div className=" rounded-full px-4 py-2 font-medium text-gray-700 hover:bg-gray-100">
+              <div className="rounded-full px-4 py-2 font-medium text-gray-700 hover:bg-gray-100">
                 <SlBasket />
                 <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-semibold flex items-center justify-center w-5 h-5 rounded-full">
                   {getCartCount()}
@@ -95,7 +88,6 @@ const Navbar = () => {
               </div>
             </Link>
 
-            {/* User Dropdown */}
             {isAuthenticated ? (
               <div className="relative group">
                 <button className="flex items-center gap-2 bg-gray-800 text-white px-4 py-2 rounded-full shadow group-hover:bg-gray-700 transition">
@@ -107,21 +99,27 @@ const Navbar = () => {
                     to="/orders"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
-                    Orders
+                    📦 Orders
                   </Link>
                   {user?.isAdmin && (
                     <Link
                       to="/dashboard"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Dashboard
+                      📊 Dashboard
                     </Link>
                   )}
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    📝 Manage Profile
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-100"
                   >
-                    Logout
+                    🚪 Logout
                   </button>
                 </div>
               </div>
@@ -135,7 +133,6 @@ const Navbar = () => {
               </NavLink>
             )}
 
-            {/* Mobile Menu Toggle */}
             <button
               ref={toggleRef}
               className="lg:hidden text-gray-700 hover:text-gray-900 text-xl"
@@ -146,8 +143,6 @@ const Navbar = () => {
           </div>
         </div>
       </header>
-
-      {/* Spacer */}
       <div className="h-[72px]"></div>
     </>
   );

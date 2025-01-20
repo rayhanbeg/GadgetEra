@@ -98,10 +98,13 @@ const Orders = () => {
 
   return (
     <div className="mx-auto max-w-screen-xl px-6 lg:px-12 py-8">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">
-        <span className="font-bold">Your</span>
-        <span className="underline ml-2">Orders</span>
-      </h2>
+      {/* Show title only if there is data */}
+      {orderData.length > 0 && (
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">
+          <span className="font-bold">Your</span>
+          <span className="underline ml-2">Orders</span>
+        </h2>
+      )}
 
       {loading ? (
         <div className="text-center py-4">
@@ -111,9 +114,12 @@ const Orders = () => {
       ) : error ? (
         <p className="text-center text-red-500 text-sm">{error}</p>
       ) : orderData.length === 0 ? (
-        <p className="text-center text-gray-500 text-sm">
-          You have no orders yet.
-        </p>
+        <div className="text-center text-gray-500 text-sm">
+          <p className="text-lg font-semibold">
+            No orders yet! 🛍️ Ready to place your first order?
+          </p>
+          <p className="mt-2">We can’t wait to pack something special for you!</p>
+        </div>
       ) : (
         <div className="space-y-6">
           {orderData.map((item, index) => (
