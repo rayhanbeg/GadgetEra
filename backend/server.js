@@ -27,7 +27,7 @@ const port = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors({
-    origin: 'http://localhost:5173', 'https://gadget-era-api.vercel.app', // Replace with your frontend URL
+    origin: ['http://localhost:5173', 'https://gadget-era-api.vercel.app'], // Replace with your frontend URL
     credentials: true,
 }));
 app.use(express.json());
