@@ -8,7 +8,7 @@ const {products} = useContext(ShopContext)
 
 useEffect(() => {
 const data = products.filter(item =>item?.popular === true)
-setPopularProducts(data.slice(0, 5))
+setPopularProducts(data.slice(0, 4))
 }, [products])
 
 
