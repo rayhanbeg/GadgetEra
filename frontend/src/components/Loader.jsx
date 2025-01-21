@@ -1,17 +1,9 @@
-import React from "react";
+import { ClipLoader } from "react-spinners";
 
-const Loader = ({ message, size, color }) => {
-  const spinnerSize = size ? `w-${size} h-${size}` : "w-10 h-10";
-  const spinnerColor = color ? `border-${color}` : "border-blue-500";
-
+const Loader = () => {
   return (
-    <div className="text-center py-4">
-      {/* Spinner */}
-      <div
-        className={`${spinnerSize} border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin mx-auto`}
-      ></div>
-      {/* Message */}
-      {message && <p className="mt-4 text-gray-500 text-sm">{message}</p>}
+    <div className="flex flex-col items-center justify-center h-full">
+      <ClipLoader size={50} color="blue-600" />
     </div>
   );
 };

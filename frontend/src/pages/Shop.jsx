@@ -1,158 +1,173 @@
-import { useContext, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom"; // Import useSearchParams to manipulate URL params
-import Search from "../components/Search";
-import { ShopContext } from "../context/ShopContext";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import Loader from "../components/Loader";
 import Item from "../components/Item";
-import Loader from "../components/Loader"; // Import the custom Loader
 
 const Shop = () => {
-  const { products, search } = useContext(ShopContext);
+  const [products, setProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [sortType, setSortType] = useState("relevant");
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true); // State for loader
   const itemPage = 10;
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Sync filters with URL params
+  const fetchProducts = async () => {
+    setLoading(true);
+    const url = new URL("http://localhost:5000/api/product/listProducts");
+    url.searchParams.set("sort", sortType);
+    
+    // Update to search by both name and description
+    if (search) {
+      url.searchParams.set("search", search); // Assumes your backend is searching by name and description
+    }
+
+    if (category.length) {
+      category.forEach((cat) => url.searchParams.append("category", cat));
+    }
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      setProducts(data.products || []);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Get filters from search params (URL)
     const categoryParam = searchParams.getAll("category");
     const sortTypeParam = searchParams.get("sort");
-    
+    const searchParam = searchParams.get("search");
+
     if (categoryParam.length) setCategory(categoryParam);
     if (sortTypeParam) setSortType(sortTypeParam);
+    if (searchParam) setSearch(searchParam);
   }, [searchParams]);
 
-  // Update search params when filters change (this part moved to the useEffect hook)
   useEffect(() => {
-    // Update URL search params based on category and sortType state
     setSearchParams((params) => {
       params.delete("category");
       category.forEach((cat) => params.append("category", cat));
-      if (sortType) {
-        params.set("sort", sortType);
+      params.set("sort", sortType);
+      if (search) params.set("search", search);
+      return params;
+    });
+  }, [category, sortType, search, setSearchParams]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [category, sortType, search]);
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearch(query);
+    setSearchParams((params) => {
+      // Only update search param if there is a query
+      if (query.trim()) {
+        params.set("search", query);
+      } else {
+        params.delete("search"); // Remove search param if query is empty
       }
       return params;
     });
-  }, [category, sortType, setSearchParams]);
-
-  const toggleFilter = (value, setState) => {
-    setState((prev) => {
-      const updated = prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value];
-
-      return updated;
-    });
   };
-
-  const applyFilter = () => {
-    let filtered = [...products];
-    if (search) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    if (category.length) {
-      filtered = filtered.filter((product) =>
-        category.includes(product.category)
-      );
-    }
-    return filtered;
-  };
-
-  const applySorting = (productList) => {
-    switch (sortType) {
-      case "low":
-        return productList.sort((a, b) => a.price - b.price);
-      case "high":
-        return productList.sort((a, b) => b.price - a.price);
-      default:
-        return productList;
-    }
-  };
-
-  // Update filtered products when filters or products change
-  useEffect(() => {
-    setLoading(true);
-    let filtered = applyFilter();
-    let sorted = applySorting(filtered);
-    setFilteredProducts(sorted);
-    setCurrentPage(1); // Reset to the first page when filters change
-    setLoading(false);
-  }, [category, sortType, products, search]);
 
   const getPaginatedProducts = () => {
     const startIndex = (currentPage - 1) * itemPage;
-    const endIndex = startIndex + itemPage;
-    return filteredProducts.slice(startIndex, endIndex);
+    return products.slice(startIndex, startIndex + itemPage);
   };
 
-  const totalPages = Math.ceil(filteredProducts.length / itemPage);
+  const totalPages = Math.ceil(products.length / itemPage);
 
   return (
-    <div className="mx-auto max-w-[1440px] px-6 lg:px-12 mt-12">
-      <div className="flex flex-col sm:flex-row gap-8 mb-16">
-        {/* Filter Options */}
-        <div className="min-w-[200px] sm:border-l sm:pl-6 bg-primary/10">
-          <div className="flex items-center border-2 rounded-xl max-h-16">
-            <Search />
+    <div className="mx-auto max-w-[1440px] lg:px-12 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-8">
+        {/* Filters Section */}
+        <aside className="sm:col-span-1 space-y-6">
+          {/* Search Bar - Moved to the top */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <input
+              type="text"
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Search for products..."
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
+            />
           </div>
-          <div className="mt-4 border p-4 rounded-md bg-white">
-            <h5 className="text-lg font-semibold mb-3">Categories</h5>
-            <div className="flex flex-col gap-2">
-              {["Headphones", "Cameras", "Speakers", "Earphones", "Watches", "Mouse", "Mobile"].map((cat, index) => (
-                <label key={index} className="flex gap-2 text-sm">
+
+          {/* Categories Filter */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h5 className="text-lg font-semibold mb-4">Categories</h5>
+            <div className="space-y-2">
+              {[
+                "Headphones",
+                "Cameras",
+                "Speakers",
+                "Earphones",
+                "Watches",
+                "Mouse",
+                "Mobile",
+              ].map((cat) => (
+                <label key={cat} className="flex items-center space-x-3 text-sm">
                   <input
-                    onChange={(e) => toggleFilter(e.target.value, setCategory)}
                     type="checkbox"
-                    name="category"
-                    value={cat}
                     checked={category.includes(cat)}
+                    onChange={() =>
+                      setCategory((prev) =>
+                        prev.includes(cat)
+                          ? prev.filter((c) => c !== cat)
+                          : [...prev, cat]
+                      )
+                    }
+                    className="accent-blue-500"
                   />
-                  {cat}
+                  <span>{cat}</span>
                 </label>
               ))}
             </div>
           </div>
-          <div className="mt-6 border p-4 rounded-md">
-            <h5 className="text-lg font-semibold mb-3">Sort By</h5>
+
+          {/* Sort Options */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h5 className="text-lg font-semibold mb-4">Sort By</h5>
             <select
-              onChange={(e) => setSortType(e.target.value)}
-              className="border w-full rounded px-2 py-1"
               value={sortType}
+              onChange={(e) => setSortType(e.target.value)}
+              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-300"
             >
               <option value="relevant">Relevant</option>
               <option value="low">Price: Low to High</option>
               <option value="high">Price: High to Low</option>
             </select>
           </div>
-        </div>
+        </aside>
 
-        {/* Product Display */}
-        <div className="flex-1">
+        {/* Products Section */}
+        <main className="sm:col-span-3">
           {loading ? (
-            <Loader message="Loading products..." size="12" color="blue-500" />
+            <Loader />
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {getPaginatedProducts().length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {getPaginatedProducts().length ? (
                 getPaginatedProducts().map((product) => (
-                  <Item product={product} key={product._id} />
+                  <Item key={product._id} product={product} />
                 ))
               ) : (
-                <p className="text-center col-span-full">
-                  No products found matching your filters.
+                <p className="col-span-full text-center text-gray-500">
+                  No products found.
                 </p>
               )}
             </div>
           )}
 
           {/* Pagination */}
-          {!loading && (
-            <div className="flex justify-center items-center mt-10 gap-3">
+          {!loading && totalPages > 1 && (
+            <div className="flex justify-center items-center mt-8 space-x-2">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((prev) => prev - 1)}
@@ -167,7 +182,9 @@ const Shop = () => {
                   key={index + 1}
                   onClick={() => setCurrentPage(index + 1)}
                   className={`px-4 py-2 border rounded ${
-                    currentPage === index + 1 ? "font-semibold border-black" : ""
+                    currentPage === index + 1
+                      ? "bg-blue-500 text-white"
+                      : "hover:bg-gray-100"
                   }`}
                 >
                   {index + 1}
@@ -186,7 +203,7 @@ const Shop = () => {
               </button>
             </div>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );

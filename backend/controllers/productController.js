@@ -72,37 +72,36 @@ const listProducts = async (req, res) => {
 
 
 const listProductss = async (req, res) => {
+  const { search = "", sort = "relevant", category = [] } = req.query;
+
+  const filter = {};
+
+  // Search by name and description
+  if (search) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },  // Case-insensitive search in name
+      { description: { $regex: search, $options: "i" } } // Case-insensitive search in description
+    ];
+  }
+
+  // Filter by category if provided
+  if (category.length) {
+    filter.category = { $in: category };
+  }
+
+  // Sorting options
+  const sortOptions = {
+    relevant: null,
+    low: { price: 1 },
+    high: { price: -1 },
+  };
+
   try {
-    const { search, category, minPrice, maxPrice } = req.query; // Accept query params for search and filters
-    
-    // Build the filter object
-    let filter = {};
-
-    // Case-insensitive search
-    if (search) {
-      filter.name = { $regex: search, $options: "i" };
-    }
-
-    // Handle category filter - allow for multiple categories
-    if (category) {
-      filter.category = { $in: category.split(',') }; // Splits categories if they are comma-separated
-    }
-
-    // Handle price range filters
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);  // Ensure it's a number
-      if (maxPrice) filter.price.$lte = Number(maxPrice);  // Ensure it's a number
-    }
-
-    // Query the database for products
-    const products = await productModel.find(filter);
-    
-    // Return the products in the response
-    res.json({ success: true, products });
+    const products = await productModel.find(filter).sort(sortOptions[sort] || {});
+    res.json({ products });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message }); // Respond with error message and status code 500
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
   }
 };
 
