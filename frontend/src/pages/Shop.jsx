@@ -16,7 +16,7 @@ const Shop = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const url = new URL("http://localhost:5000/api/product/listProducts");
+    const url = new URL(`${import.meta.env.VITE_API_BASE_URL}/api/product/listProducts`);
     url.searchParams.set("sort", sortType);
     
     // Update to search by both name and description
