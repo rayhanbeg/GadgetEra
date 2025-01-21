@@ -69,6 +69,47 @@ const listProducts = async (req, res) => {
   }
 };
 
+
+
+const listProductss = async (req, res) => {
+  try {
+    const { search, category, minPrice, maxPrice } = req.query; // Accept query params for search and filters
+    
+    // Build the filter object
+    let filter = {};
+
+    // Case-insensitive search
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
+
+    // Handle category filter - allow for multiple categories
+    if (category) {
+      filter.category = { $in: category.split(',') }; // Splits categories if they are comma-separated
+    }
+
+    // Handle price range filters
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);  // Ensure it's a number
+      if (maxPrice) filter.price.$lte = Number(maxPrice);  // Ensure it's a number
+    }
+
+    // Query the database for products
+    const products = await productModel.find(filter);
+    
+    // Return the products in the response
+    res.json({ success: true, products });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message }); // Respond with error message and status code 500
+  }
+};
+
+
+
+
+
 const singleProduct = async (req, res) => {
   try {
     const {id} = req.body
@@ -113,4 +154,4 @@ const updateProduct = async (req, res) => {
 };
 
 
-export { addProduct, removeProduct, listProducts, singleProduct, updateProduct };
+export { addProduct, removeProduct, listProducts, singleProduct, updateProduct, listProductss };
