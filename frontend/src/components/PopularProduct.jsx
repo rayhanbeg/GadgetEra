@@ -25,7 +25,7 @@ setPopularProducts(data.slice(0, 4))
           your everyday experience.
         </p>
       </div>
-      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {popularProducts.map((product) => (
           <div key={product._id}>
             <Item product={product} />

@@ -80,4 +80,37 @@ const singleProduct = async (req, res) => {
   }
 };
 
-export { addProduct, removeProduct, listProducts, singleProduct };
+
+
+const updateProduct = async (req, res) => {
+  try {
+    const { id, name, price, category, colors, popular, description } = req.body;
+    const images = [req.files?.image1?.[0], req.files?.image2?.[0], req.files?.image3?.[0], req.files?.image4?.[0]].filter(Boolean);
+
+    const imagesUrl = images.length > 0 ? await uploadImagesToCloudinary(images) : null;
+
+    const updateData = {
+      name,
+      price,
+      category,
+      popular: popular === "true",
+      colors: colors ? JSON.parse(colors) : [],
+      description,
+    };
+
+    if (imagesUrl) updateData.image = imagesUrl;
+
+    const updatedProduct = await productModel.findByIdAndUpdate(id, updateData, { new: true });
+    if (!updatedProduct) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Product updated successfully", product: updatedProduct });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Error updating product" });
+  }
+};
+
+
+export { addProduct, removeProduct, listProducts, singleProduct, updateProduct };
