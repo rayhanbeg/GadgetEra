@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import Item from "../components/Item";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -175,7 +177,7 @@ const Shop = () => {
                   currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Previous
+               <FaArrowLeft />
               </button>
               {Array.from({ length: totalPages }, (_, index) => (
                 <button
@@ -199,7 +201,7 @@ const Shop = () => {
                     : ""
                 }`}
               >
-                Next
+                <FaArrowRight />
               </button>
             </div>
           )}
