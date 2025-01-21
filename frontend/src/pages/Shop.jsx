@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"; // import useNavigate
 import Loader from "../components/Loader";
 import Item from "../components/Item";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
-
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -15,15 +14,15 @@ const Shop = () => {
   const itemPage = 10;
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();  // to navigate programmatically
 
   const fetchProducts = async () => {
     setLoading(true);
     const url = new URL(`${import.meta.env.VITE_API_BASE_URL}/api/product/listProducts`);
     url.searchParams.set("sort", sortType);
-    
-    // Update to search by both name and description
+
     if (search) {
-      url.searchParams.set("search", search); // Assumes your backend is searching by name and description
+      url.searchParams.set("search", search);
     }
 
     if (category.length) {
@@ -51,15 +50,20 @@ const Shop = () => {
     if (searchParam) setSearch(searchParam);
   }, [searchParams]);
 
+  // Update the searchParams manually when any change happens
   useEffect(() => {
-    setSearchParams((params) => {
-      params.delete("category");
-      category.forEach((cat) => params.append("category", cat));
-      params.set("sort", sortType);
-      if (search) params.set("search", search);
-      return params;
-    });
-  }, [category, sortType, search, setSearchParams]);
+    const params = new URLSearchParams();
+
+    // Add category
+    category.forEach((cat) => params.append("category", cat));
+    // Add sort type
+    params.set("sort", sortType);
+    // Add search term
+    if (search) params.set("search", search);
+
+    // Update the URL params without reloading the page
+    navigate({ search: params.toString() }, { replace: true });  // Important to replace instead of push
+  }, [category, sortType, search, navigate]);
 
   useEffect(() => {
     fetchProducts();
@@ -68,15 +72,6 @@ const Shop = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearch(query);
-    setSearchParams((params) => {
-      // Only update search param if there is a query
-      if (query.trim()) {
-        params.set("search", query);
-      } else {
-        params.delete("search"); // Remove search param if query is empty
-      }
-      return params;
-    });
   };
 
   const getPaginatedProducts = () => {
@@ -177,7 +172,7 @@ const Shop = () => {
                   currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-               <FaArrowLeft />
+                <FaArrowLeft />
               </button>
               {Array.from({ length: totalPages }, (_, index) => (
                 <button
